@@ -1,4 +1,4 @@
-# Monolith: Shop Demo (Spring Boot)
+# Monolith: Shop Demo (Spring Boot backend)
 
 Een kleine monoliet met:
 - **Auth**: register/login (dummy, geen echte security)
@@ -7,6 +7,7 @@ Een kleine monoliet met:
 - **Payments**: gesimuleerde betaling
 
 ## Quickstart
+Installeer Java 23
 
 ```bash
 ./mvnw spring-boot:run
@@ -16,8 +17,15 @@ H2 Console: `http://localhost:8080/h2-console` (JDBC URL: `jdbc:h2:mem:testdb`)
 
 ### Endpoints (selectie)
 POST /api/auth/register { "username": "alice", "password": "pw" }
+
 POST /api/auth/login { "username": "alice", "password": "pw" }
+
 GET /api/products
+
 POST /api/products { "name": "Book", "description": "SWA", "price": 19.99, "stock": 5 }
+
 POST /api/orders { "userId": 1, "items": [{ "productId": 1, "quantity": 2 }]}
+
 GET /api/orders/{id}
+
+De folder src/main/resources bevat een Bruno collection (bruno.json) die je in Bruno kunt importeren om endpoints te testen.
