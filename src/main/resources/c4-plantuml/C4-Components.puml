@@ -1,38 +1,70 @@
-@startuml Monolith_Components
+@startuml MicroService_Components
 !include https://raw.githubusercontent.com/plantuml-stdlib/C4-PlantUML/master/C4_Component.puml
-title Monolith - C4 Component Diagram (Controllers, Services, Repositories)
+title MicroService - C4 Component Diagram (Controllers, Services, Repositories)
 LAYOUT_LEFT_RIGHT()
 
-Container_Boundary(c_app, "Monolith Spring Boot", "Spring Boot") {
-
-  ' === Controllers ===
+Container_Boundary(auth_app, "AuthenticationApp MicroService Spring Boot", "Spring Boot") {
   Component(authController, "AuthController", "Spring @RestController", "Handles register/login endpoints")
-  Component(productController, "ProductController", "Spring @RestController", "CRUD for products")
-  Component(orderController, "OrderController", "Spring @RestController", "Create/get orders")
-
-  ' === Services ===
   Component(authService, "AuthService", "Spring @Service", "User registration & login logic")
-  Component(orderService, "OrderService", "Spring @Service", "Create order, stock mgmt, payment orchestration")
-  Component(paymentService, "PaymentService", "Spring @Service", "Simulated payment provider")
-
-  ' === Repositories ===
   Component(userRepo, "UserRepository", "Spring Data JPA @Repository", "CRUD access to User")
-  Component(productRepo, "ProductRepository", "Spring Data JPA @Repository", "CRUD access to Product")
-  Component(orderRepo, "OrderRepository", "Spring Data JPA @Repository", "CRUD access to Order")
 }
 
-' === Relationships (from code) ===
-' Controllers → Services/Repositories
-Rel(authController, authService, "uses", "Method calls")
-Rel(productController, productRepo, "uses", "Direct data access")
-Rel(orderController, orderService, "uses", "Creates orders")
-Rel(orderController, orderRepo, "uses", "Read order by id")
+Container_Boundary(auth_db, "AuthenticationApp Database", "H2 Database") {
+  Component(userTable, "User Table", "Table", "Stores user details")
+}
 
-' Services → Repositories/Services
+Container_Boundary(product_app, "ProductApp MicroService Spring Boot", "Spring Boot") {
+  Component(productController, "ProductController", "Spring @RestController", "CRUD for products")
+  Component(productService, "ProductService", "Spring @Service", "Create/get products")
+  Component(productRepo, "ProductRepository", "Spring Data JPA @Repository", "CRUD access to Product")
+}
+
+Container_Boundary(product_db, "ProductApp Database", "H2 Database") {
+  Component(productTable, "Product Table", "Table", "Stores product details")
+}
+
+Container_Boundary(order_app, "OrderApp MicroService Spring Boot", "Spring Boot") {
+  Component(orderController, "OrderController", "Spring @RestController", "Create/get orders")
+  Component(orderService, "OrderService", "Spring @Service", "Create order, stock mgmt, payment orchestration")
+  Component(orderRepo, "OrderRepository", "Spring Data JPA @Repository", "CRUD access to Order")
+  Component(productClient, "ProductClient", "Spring @Component", "Calls ProductApp API")
+  Component(paymentClient, "PaymentClient", "Spring @Component", "Calls PaymentApp API")
+  Component(authClientForOrderService, "AuthClient", "Spring @Component", "Calls AuthenticationApp API")
+}
+
+Container_Boundary(order_db, "OrderApp Database", "H2 Database") {
+  Component(orderTable, "Order Table", "Table", "Stores order details")
+}
+
+Container_Boundary(payment_app, "PaymentApp MicroService Spring Boot", "Spring Boot") {
+  Component(paymentController, "PaymentController", "Spring @RestController", "Create payments")
+  Component(paymentService, "PaymentService", "Spring @Service", "Simulated payment provider")
+  Component(authClientForPaymentService, "AuthClient", "Spring @Component", "Calls AuthenticationApp API")
+}
+
+Rel(authController, authService, "uses", "Method calls")
 Rel(authService, userRepo, "uses", "Find/save users")
-Rel(orderService, productRepo, "uses", "Check/update stock")
-Rel(orderService, orderRepo, "uses", "Persist orders")
-Rel(orderService, paymentService, "invokes", "Process payment")
+Rel(userRepo, userTable, "Reads from and writes to", "JPA")
+
+Rel(productController, productService, "uses", "List of products, product details")
+Rel(productService, productRepo, "uses", "Direct data access")
+Rel(productRepo, productTable, "Reads from and writes to", "JPA")
+
+Rel(orderController, orderService, "uses", "Creates orders")
+Rel(orderService, orderRepo, "uses", "Read order by id")
+Rel(orderRepo, orderTable, "Reads from and writes to", "JPA")
+
+Rel(orderService, productClient, "uses", "Gateway to ProductApp API")
+Rel(orderService, authClientForOrderService, "uses", "Gateway to AuthenticationApp API")
+Rel(orderService, paymentClient, "uses", "Gateway to PaymentApp API")
+
+Rel(productClient, productController, "calls", "Calls PaymentApp API")
+Rel(paymentClient, paymentController, "calls", "Calls PaymentApp API")
+Rel(authClientForOrderService, authController, "calls", "Calls AuthenticationApp API")
+Rel(authClientForPaymentService, authController, "calls", "Calls AuthenticationApp API")
+
+Rel(paymentController, paymentService, "uses", "Creates payments")
+Rel(paymentService, authClientForPaymentService, "uses", "Gateway to AuthenticationApp API")
 
 SHOW_LEGEND()
 @enduml
