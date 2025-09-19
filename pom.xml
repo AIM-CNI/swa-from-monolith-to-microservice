@@ -5,8 +5,18 @@
     <groupId>edu.demo</groupId>
     <artifactId>monolith-springboot</artifactId>
     <version>0.0.1-SNAPSHOT</version>
+    <packaging>pom</packaging>
     <name>monolith-springboot</name>
     <description>Shop Monolith Demo</description>
+    <modules>
+        <module>auth</module>
+        <module>order</module>
+        <module>payment</module>
+        <module>product</module>
+        <module>auth-api</module>
+        <module>product-api</module>
+        <module>payment-api</module>
+    </modules>
     <properties>
         <java.version>17</java.version>
         <spring-boot.version>3.3.2</spring-boot.version>

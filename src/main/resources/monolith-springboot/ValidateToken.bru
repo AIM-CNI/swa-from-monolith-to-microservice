@@ -1,0 +1,15 @@
+meta {
+  name: ValidateToken
+  type: http
+  seq: 4
+}
+
+get {
+  url: http://localhost:8081/api/auth/validate/demo-64ce40d3-454e-47fa-b92c-790cdf6cc8e5
+  body: none
+  auth: inherit
+}
+
+settings {
+  encodeUrl: true
+}

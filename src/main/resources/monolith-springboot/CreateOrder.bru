@@ -1,18 +1,18 @@
 meta {
   name: CreateOrder
   type: http
-  seq: 3
+  seq: 8
 }
 
 post {
-  url: http://localhost:8080/api/orders
+  url: http://localhost:8082/api/orders
   body: json
   auth: inherit
 }
 
 body:json {
   {
-    "userId": 1,
+    "token": "demo-64ce40d3-454e-47fa-b92c-790cdf6cc8e5",
     "items": [
       {
         "productId": 1,
