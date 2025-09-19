@@ -21,12 +21,23 @@ Container_Boundary(c_app, "Monolith Spring Boot", "Spring Boot") {
   Component(orderRepo, "OrderRepository", "Spring Data JPA @Repository", "CRUD access to Order")
 }
 
+Container_Boundary(c_db, "H2 Database", "Relational Database") {
+  Component(orderTable, "Orders", "Table", "Stores orders")
+  Component(userTable, "Users", "Table", "Stores users")
+  Component(productTable, "Products", "Table", "Stores products")
+}
+
 ' === Relationships (from code) ===
 ' Controllers → Services/Repositories
 Rel(authController, authService, "uses", "Method calls")
 Rel(productController, productRepo, "uses", "Direct data access")
 Rel(orderController, orderService, "uses", "Creates orders")
 Rel(orderController, orderRepo, "uses", "Read order by id")
+Rel(orderRepo, orderTable, "reads/writes", "JPA")
+Rel(userRepo, userTable, "reads/writes", "JPA")
+Rel(productRepo, productTable, "reads/writes", "JPA")
+Rel(orderTable, userTable, "user_id", "FK")
+Rel(orderTable, productTable, "product_id", "FK")
 
 ' Services → Repositories/Services
 Rel(authService, userRepo, "uses", "Find/save users")
